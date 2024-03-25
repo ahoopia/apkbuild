@@ -27,7 +27,7 @@ jobs:
     - name: Set up Flutter...
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.x'  # Change this to your desired Flutter version
+        flutter-version: 'latest'  # Change this to your desired Flutter version
         cache: true
     - name: Install Dependencies
       run: |
