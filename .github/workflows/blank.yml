@@ -6,9 +6,7 @@ on:
       - main  # Change this to your main branch name
 jobs:
   build-mac-ios-android:
-    runs-on: macos-latest
-    permissions:
-      contents: write
+    runs-on: ubuntu-latest
     steps:
       #签出代码 
       - uses: actions/checkout@v3
@@ -21,13 +19,13 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: "12.x"
-          cache: 'gradle'
+          
       #设置Flutter
       - name: Flutter action
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.x'
-          cache: true 
+          
       #更新Flutter的packages
       - name: Restore packages
         run: |
