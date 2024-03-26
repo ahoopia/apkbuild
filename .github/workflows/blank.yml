@@ -40,13 +40,14 @@ jobs:
        flutter pub get
     - name: modify build.gradle
       run: |
-       rm -f simple_live_app/android/app/build.gradle
+       ls
+       rm -f ./simple_live_app/android/app/build.gradle
        mv build.gradle simple_live_app/android/app
     - name: Build APK
       run: |
        cd simple_live_app
        flutter build apk
-       ls build/app/outputs/flutter-apk
+       ls ./build/app/outputs/flutter-apk
       
     #- name: Sign APK
     #  run: |
@@ -71,5 +72,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/app/outputs/flutter-apk
+        asset_path: simple_live_app/build/app/outputs/flutter-apk
         asset_content_type: application/vnd.android.package-archive
