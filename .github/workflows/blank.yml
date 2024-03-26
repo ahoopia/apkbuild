@@ -1,9 +1,9 @@
 name: Flutter Build, Sign, and Distribute
 
 on:
-  #push:
-    #branches:
-      #- main  # Change this to your main branch name
+  push:
+    branches:
+      - main  # Change this to your main branch name
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
