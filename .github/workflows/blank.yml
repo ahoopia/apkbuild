@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: check local
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        
     - name: Checkout Flutter App Repository
       uses: actions/checkout@v2
       with:
