@@ -10,12 +10,7 @@ jobs:
   build_sign_and_distribute:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: check local
-      uses: actions/checkout@v2
-      with:
-        ref: main
-        
+    steps:    
     - name: Checkout Flutter App Repository
       uses: actions/checkout@v2
       with:
@@ -24,9 +19,8 @@ jobs:
     - name: modify build.gradle
       run: |
        ls
-       rm -f ./simple_live_app/android/app/build.gradle
-       mv build.gradle simple_live_app/android/app
-
+       sed -i '/signingConfigs.release/d' ./simple_live_app/android/app/build.gradle
+       cat ./simple_live_app/android/app/build.gradle
     - name: set up java
       uses: actions/setup-java@v3
       with: 
