@@ -21,6 +21,11 @@ jobs:
       with:
         repository: xiaoyaocz/dart_simple_live  # Change 'username/flutter-app' to the repository containing your Flutter app
         ref: master  # Change this to the branch containing your Flutter app
+    - name: modify build.gradle
+      run: |
+       ls
+       rm -f ./simple_live_app/android/app/build.gradle
+       mv build.gradle simple_live_app/android/app
 
     - name: set up java
       uses: actions/setup-java@v3
@@ -38,11 +43,7 @@ jobs:
       run: |
        cd simple_live_app
        flutter pub get
-    - name: modify build.gradle
-      run: |
-       ls
-       rm -f ./simple_live_app/android/app/build.gradle
-       mv build.gradle simple_live_app/android/app
+    
     - name: Build APK
       run: |
        cd simple_live_app
