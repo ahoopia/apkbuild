@@ -48,7 +48,7 @@ jobs:
       with:
           allowUpdates: true
           artifactErrorsFailBuild: true
-          artifacts: "./simple_live_app/build/app/outputs/flutter-apk/*.apk"
+          artifacts: "simple_live_app/build/app/outputs/flutter-apk/*.apk"
           token: ${{ secrets.GITHUB_TOKEN }}   
     #- name: Sign APK
     #  run: |
