@@ -68,4 +68,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: simple_live_app/build/app/outputs/flutter-apk
+        asset_name: app-release.apk
         asset_content_type: application/vnd.android.package-archive
