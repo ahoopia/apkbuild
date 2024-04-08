@@ -1,0 +1,45 @@
+name: Flutter Build, Sign, and Distribute
+
+on:
+  push:
+    branches:
+      - main  # Change this to your main branch name
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build_sign_and_distribute:
+    runs-on: ubuntu-latest
+
+    steps:    
+    - name: Checkout Flutter App Repository
+      uses: actions/checkout@v2
+      with:
+        ref: main  # Change this to the branch containing your Flutter app
+    - name: set up java
+      uses: actions/setup-java@v3
+      with: 
+       distribution: 'zulu'
+       java-version: '12.x'
+       cache: 'gradle'
+       
+    - name: Set up Flutter...
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.13.x'  # Change this to your desired Flutter version
+        cache: true
+    - name: Install Dependencies
+      run: |
+       flutter pub get
+    
+    - name: Build APK
+      run: |
+       flutter build apk --release --split-per-abi
+       ls ./build/app/outputs/flutter-apk
+    - name: Upload Release
+      uses: ncipollo/release-action@v1
+      with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: "/build/app/outputs/flutter-apk/*.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}   
+          tag: '1.0.2'
