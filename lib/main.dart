@@ -1,67 +1,93 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_mobile_network_info/flutter_mobile_network_info.dart';
-import 'package:connectivity/connectivity.dart';
-void main() {
-  runApp(MyApp());
-}
+import 'package:speedometer/speedometer.dart';
+import 'package:rxdart/rxdart.dart';
+
+void main() => runApp(MyApp());
+
 class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Float App with Network Info'),
-        ),
-        body: FloatApp(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // Try running your application with "flutter run". You'll see the
+        // application has a blue toolbar. Then, without quitting the app, try
+        // changing the primarySwatch below to Colors.green and then invoke
+        // "hot reload" (press "r" in the console where you ran "flutter run",
+        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+        // counter didn't reset back to zero; the application is not restarted.
+        primarySwatch: Colors.blue,
       ),
+      home: MyHomePage(title: 'SpeedOMeter Example'),
     );
   }
 }
-class FloatApp extends StatefulWidget {
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _FloatAppState createState() => _FloatAppState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
-class _FloatAppState extends State<FloatApp> {
-  String _networkType = 'Unknown';
-  String _mobileRxTotalBytes = '0';
-  String _mobileTxTotalBytes = '0';
-  String _wifiTotalBytes = '0';
+
+class _MyHomePageState extends State<MyHomePage> {
+  double _lowerValue = 20.0;
+  double _upperValue = 40.0;
+  int start = 0;
+  int end = 60;
+
+  int counter = 0;
+
+  PublishSubject<double> eventObservable = PublishSubject();
   @override
   void initState() {
     super.initState();
-    _initNetworkInfo();
+    const oneSec = const Duration(seconds: 1);
+    var rng = Random();
+    Timer.periodic(oneSec,
+        (Timer t) => eventObservable.add(rng.nextInt(59) + rng.nextDouble()));
   }
-  Future<void> _initNetworkInfo() async {
-    try {
-      // 获取网络类型
-      String networkType = await FlutterMobileNetworkInfo().getNetworkType;
-      setState(() {
-        _networkType = networkType;
-      });
-      // 获取移动数据流量接收总字节数
-      String mobileRxTotalBytes = await FlutterMobileNetworkInfo().getMobileRxTotalBytes;
-      setState(() {
-        _mobileRxTotalBytes = mobileRxTotalBytes;
-      });
-      // 获取移动数据流量发送总字节数
-      String mobileTxTotalBytes = await FlutterMobileNetworkInfo().getMobileTxTotalBytes;
-      setState(() {
-        _mobileTxTotalBytes = mobileTxTotalBytes;
-      });
-      // 检查Wi-Fi连接并获取Wi-Fi流量信息
-      ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.wifi) {
-        DataUsageResult dataUsageResult = await Connectivity().getWifiDataUsage();
-        setState(() {
-          _wifiTotalBytes = dataUsageResult.total.toString();
-        });
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      childre
+    final ThemeData somTheme = ThemeData(
+        primaryColor: Colors.blue,
+        accentColor: Colors.black,
+        backgroundColor: Colors.grey);
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("SpeedOMeter"),
+        ),
+        body: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(40.0),
+              child: SpeedOMeter(
+                  start: start,
+                  end: end,
+                  highlightStart: (_lowerValue / end),
+                  highlightEnd: (_upperValue / end),
+                  themeData: somTheme,
+                  eventObservable: this.eventObservable),
+            ),
+          ],
+        ));
+  }
+}
