@@ -80,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+/*
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -163,6 +164,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 }
+*/
 
 class SubscriptionPage extends StatelessWidget {
   @override
@@ -229,5 +231,100 @@ class ProfilePage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> _imageUrls = List.generate(
+    20,
+    (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
+  );
+
+  bool _isLoading = false;
+
+  ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      if (!_isLoading) {
+        _loadMoreImages();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, // Two columns
+        mainAxisSpacing: 4.0, // Spacing between rows
+        crossAxisSpacing: 4.0, // Spacing between columns
+        childAspectRatio: 0.75, // Aspect ratio of the grid tiles
+      ),
+      itemCount: _imageUrls.length + 1, // Add one for loading indicator
+      controller: _scrollController,
+      itemBuilder: (BuildContext context, int index) {
+        if (index < _imageUrls.length) {
+          return _buildGridTile(index);
+        } else {
+          return _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Container(); // Placeholder for loading indicator
+        }
+      },
+    );
+  }
+
+  Widget _buildGridTile(int index) {
+    return GridTile(
+      child: Image.network(
+        _imageUrls[index], // Use actual image URL
+        fit: BoxFit.cover,
+      ),
+      footer: Container(
+        color: Colors.white.withOpacity(0.7),
+        child: ListTile(
+          leading: Icon(Icons.video_library),
+          title: Text('Video $index'),
+        ),
+      ),
+    );
+  }
+
+  // Method to load more images
+  void _loadMoreImages() {
+    setState(() {
+      _isLoading = true;
+    });
+    // Simulate loading delay
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _isLoading = false;
+        // Add more images to the list
+        _imageUrls.addAll(List.generate(
+          20,
+          (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
+        ));
+      });
+    });
   }
 }
