@@ -27,7 +27,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    SubscriptionsPage(),
+    SubscriptionPage(),
+    NewContentPage(),
     HistoryPage(),
     ProfilePage(),
   ];
@@ -48,7 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        type: BottomNavigationBarType.fixed, // Keep all items visible
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -56,6 +58,10 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.subscriptions),
             label: 'Subscriptions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add, size: 40), // Larger size for the new content icon
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
@@ -67,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.red,
+        selectedItemColor: Colors.blue, // Change color for selected item
         onTap: _onItemTapped,
       ),
     );
@@ -77,17 +83,50 @@ class _MyHomePageState extends State<MyHomePage> {
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Home Page'),
+    return SingleChildScrollView(
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => ListTile(
+            leading: Icon(Icons.video_library),
+            title: Text('Video $index'),
+          ),
+        ),
+      ),
     );
   }
 }
 
-class SubscriptionsPage extends StatelessWidget {
+class SubscriptionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Subscriptions Page'),
+    return SingleChildScrollView(
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => ListTile(
+            leading: Icon(Icons.subscriptions),
+            title: Text('Subscription $index'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NewContentPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => ListTile(
+            leading: Icon(Icons.add_circle_outline),
+            title: Text('New Content $index'),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -95,8 +134,16 @@ class SubscriptionsPage extends StatelessWidget {
 class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('History Page'),
+    return SingleChildScrollView(
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => ListTile(
+            leading: Icon(Icons.history),
+            title: Text('History $index'),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -104,8 +151,16 @@ class HistoryPage extends StatelessWidget {
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Profile Page'),
+    return SingleChildScrollView(
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => ListTile(
+            leading: Icon(Icons.account_circle),
+            title: Text('Profile $index'),
+          ),
+        ),
+      ),
     );
   }
 }
