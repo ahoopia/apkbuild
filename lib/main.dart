@@ -80,20 +80,87 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> _imageUrls = List.generate(
+    20,
+    (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
+  );
+
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => ListTile(
-            leading: Icon(Icons.video_library),
-            title: Text('Video $index'),
-          ),
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, // Two columns
+        mainAxisSpacing: 4.0, // Spacing between rows
+        crossAxisSpacing: 4.0, // Spacing between columns
+        childAspectRatio: 0.75, // Aspect ratio of the grid tiles
+      ),
+      itemCount: _imageUrls.length + 1, // Add one for loading indicator
+      itemBuilder: (BuildContext context, int index) {
+        if (index < _imageUrls.length) {
+          return index >= _imageUrls.length - 1 && _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _buildGridTile(index);
+        } else {
+          return Container(); // Placeholder for loading indicator
+        }
+      },
+    );
+  }
+
+  Widget _buildGridTile(int index) {
+    return GridTile(
+      child: Image.network(
+        _imageUrls[index], // Use actual image URL
+        fit: BoxFit.cover,
+      ),
+      footer: Container(
+        color: Colors.white.withOpacity(0.7),
+        child: ListTile(
+          leading: Icon(Icons.video_library),
+          title: Text('Video $index'),
         ),
       ),
     );
+  }
+
+  // Method to load more images
+  void _loadMoreImages() {
+    // Simulate loading delay
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _isLoading = false;
+        // Add more images to the list
+        _imageUrls.addAll(List.generate(
+          20,
+          (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
+        ));
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for scroll events
+    ScrollController _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        // Reached the bottom of the list
+        setState(() {
+          _isLoading = true;
+        });
+        _loadMoreImages();
+      }
+    });
   }
 }
 
