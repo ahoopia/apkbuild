@@ -1,330 +1,95 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(SearchApp());
 }
 
-class MyApp extends StatelessWidget {
+class SearchApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'YouTube Clone',
+      title: 'Search Component',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: SearchScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class SearchScreen extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-
-  static List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
-    SubscriptionPage(),
-    NewContentPage(),
-    HistoryPage(),
-    ProfilePage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class _SearchScreenState extends State<SearchScreen> {
+  final List<String> items = List.generate(100, (index) => 'Item $index');
+  final ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('YouTube Clone'),
+        title: Text('Search'),
       ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: ListView.builder(
+        controller: _controller,
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(items[index]),
+          );
+        },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // Keep all items visible
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.subscriptions),
-            label: 'Subscriptions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add, size: 40), // Larger size for the new content icon
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-          ),
+      floatingActionButton: AlphabetScrollBar(
+        onAlphabetSelected: (index) {
+          _scrollToIndex(index);
+        },
+      ),
+    );
+  }
+
+  void _scrollToIndex(int index) {
+    double itemExtent = 50; // Adjust this value according to your item height
+    _controller.animateTo(index * itemExtent,
+        duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+  }
+}
+
+class AlphabetScrollBar extends StatelessWidget {
+  final Function(int) onAlphabetSelected;
+
+  const AlphabetScrollBar({Key key, this.onAlphabetSelected}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerRight,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (int i = 0; i < 26; i++)
+            GestureDetector(
+              onTap: () {
+                if (onAlphabetSelected != null) {
+                  onAlphabetSelected(i);
+                }
+              },
+              child: Container(
+                width: 30,
+                height: 20,
+                margin: EdgeInsets.symmetric(vertical: 2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Center(
+                  child: Text(String.fromCharCode('A'.codeUnitAt(0) + i)),
+                ),
+              ),
+            ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue, // Change color for selected item
-        onTap: _onItemTapped,
       ),
     );
-  }
-}
-
-/*
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  List<String> _imageUrls = List.generate(
-    20,
-    (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
-  );
-
-  bool _isLoading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // Two columns
-        mainAxisSpacing: 4.0, // Spacing between rows
-        crossAxisSpacing: 4.0, // Spacing between columns
-        childAspectRatio: 0.75, // Aspect ratio of the grid tiles
-      ),
-      itemCount: _imageUrls.length + 1, // Add one for loading indicator
-      itemBuilder: (BuildContext context, int index) {
-        if (index < _imageUrls.length) {
-          return index >= _imageUrls.length - 1 && _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : _buildGridTile(index);
-        } else {
-          return Container(); // Placeholder for loading indicator
-        }
-      },
-    );
-  }
-
-  Widget _buildGridTile(int index) {
-    return GridTile(
-      child: Image.network(
-        _imageUrls[index], // Use actual image URL
-        fit: BoxFit.cover,
-      ),
-      footer: Container(
-        color: Colors.white.withOpacity(0.7),
-        child: ListTile(
-          leading: Icon(Icons.video_library),
-          title: Text('Video $index'),
-        ),
-      ),
-    );
-  }
-
-  // Method to load more images
-  void _loadMoreImages() {
-    // Simulate loading delay
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        _isLoading = false;
-        // Add more images to the list
-        _imageUrls.addAll(List.generate(
-          20,
-          (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
-        ));
-      });
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Listen for scroll events
-    ScrollController _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        // Reached the bottom of the list
-        setState(() {
-          _isLoading = true;
-        });
-        _loadMoreImages();
-      }
-    });
-  }
-}
-*/
-
-class SubscriptionPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => ListTile(
-            leading: Icon(Icons.subscriptions),
-            title: Text('Subscription $index'),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class NewContentPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => ListTile(
-            leading: Icon(Icons.add_circle_outline),
-            title: Text('New Content $index'),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class HistoryPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => ListTile(
-            leading: Icon(Icons.history),
-            title: Text('History $index'),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => ListTile(
-            leading: Icon(Icons.account_circle),
-            title: Text('Profile $index'),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  List<String> _imageUrls = List.generate(
-    20,
-    (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
-  );
-
-  bool _isLoading = false;
-
-  ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_scrollListener);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      if (!_isLoading) {
-        _loadMoreImages();
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // Two columns
-        mainAxisSpacing: 4.0, // Spacing between rows
-        crossAxisSpacing: 4.0, // Spacing between columns
-        childAspectRatio: 0.75, // Aspect ratio of the grid tiles
-      ),
-      itemCount: _imageUrls.length + 1, // Add one for loading indicator
-      controller: _scrollController,
-      itemBuilder: (BuildContext context, int index) {
-        if (index < _imageUrls.length) {
-          return _buildGridTile(index);
-        } else {
-          return _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Container(); // Placeholder for loading indicator
-        }
-      },
-    );
-  }
-
-  Widget _buildGridTile(int index) {
-    return GridTile(
-      child: Image.network(
-        _imageUrls[index], // Use actual image URL
-        fit: BoxFit.cover,
-      ),
-      footer: Container(
-        color: Colors.white.withOpacity(0.7),
-        child: ListTile(
-          leading: Icon(Icons.video_library),
-          title: Text('Video $index'),
-        ),
-      ),
-    );
-  }
-
-  // Method to load more images
-  void _loadMoreImages() {
-    setState(() {
-      _isLoading = true;
-    });
-    // Simulate loading delay
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        _isLoading = false;
-        // Add more images to the list
-        _imageUrls.addAll(List.generate(
-          20,
-          (index) => 'https://via.placeholder.com/300', // Replace with actual image URL
-        ));
-      });
-    });
   }
 }
