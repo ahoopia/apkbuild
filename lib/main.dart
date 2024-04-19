@@ -57,9 +57,9 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class AlphabetScrollBar extends StatelessWidget {
-  final Function(int) onAlphabetSelected;
+  final void Function(int) onAlphabetSelected;
 
-  const AlphabetScrollBar({Key key, this.onAlphabetSelected}) : super(key: key);
+  const AlphabetScrollBar({Key? key, required this.onAlphabetSelected}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +71,7 @@ class AlphabetScrollBar extends StatelessWidget {
           for (int i = 0; i < 26; i++)
             GestureDetector(
               onTap: () {
-                if (onAlphabetSelected != null) {
-                  onAlphabetSelected(i);
-                }
+                onAlphabetSelected(i);
               },
               child: Container(
                 width: 30,
