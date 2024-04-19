@@ -11,6 +11,16 @@ class SearchApp extends StatelessWidget {
       title: 'Search Component',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          color: Colors.blue,
+        ),
+        textTheme: TextTheme(
+          bodyText2: TextStyle(
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
       ),
       home: SearchScreen(),
     );
@@ -30,7 +40,12 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search'),
+        title: Text(
+          'Search',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
       ),
       body: ListView.builder(
         controller: _controller,
@@ -56,33 +71,52 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-class AlphabetScrollBar extends StatelessWidget {
+class AlphabetScrollBar extends StatefulWidget {
   final void Function(int) onAlphabetSelected;
 
   const AlphabetScrollBar({Key? key, required this.onAlphabetSelected}) : super(key: key);
 
   @override
+  _AlphabetScrollBarState createState() => _AlphabetScrollBarState();
+}
+
+class _AlphabetScrollBarState extends State<AlphabetScrollBar> {
+  int _selectedIndex = -1;
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.centerRight,
+      height: MediaQuery.of(context).size.height,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           for (int i = 0; i < 26; i++)
-            GestureDetector(
-              onTap: () {
-                onAlphabetSelected(i);
-              },
-              child: Container(
-                width: 30,
-                height: 20,
-                margin: EdgeInsets.symmetric(vertical: 2),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Center(
-                  child: Text(String.fromCharCode('A'.codeUnitAt(0) + i)),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = i;
+                  });
+                  widget.onAlphabetSelected(i);
+                },
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    color: _selectedIndex == i ? Colors.blue.withOpacity(0.5) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: EdgeInsets.all(8),
+                  child: Center(
+                    child: Text(
+                      String.fromCharCode('A'.codeUnitAt(0) + i),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: _selectedIndex == i ? Colors.white : Colors.blue,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
